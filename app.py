@@ -17,28 +17,26 @@ le = pickle.load(open('chatbotLabelencoder.pkl','rb'))
 # chatbot = pipeline("text-generation", model="facebook/bart-base")
 
 def chat(user_input):
-    # Generate response using the chatbot library
-    
     if user_input.lower() == 'exit':
-        print("الي اللقاء سعيد بخدمتك")
+        st.write("الي اللقاء سعيد بخدمتك")
     else:
         text = tokenizer.texts_to_sequences([user_input])
-        text = pad_sequences(text,maxlen=20)
+        text = pad_sequences(text,maxlen=7)
         result = model.predict(text)
         output_class = np.argmax(result)
         output = le.inverse_transform(np.array([output_class]))
-        # predicted_answer = data[data['label'] == data]['answer'].iloc[0]
-        mask = data['label'] == output[0]
-        if mask.any():
-          random_index = np.random.choice(mask[mask].index)
-          random_row = data.iloc[random_index]
-          # print(random_row['answer'])
-          # print(output[0])
-          # print("----------------")
-          # print(random_row['answer'] )
-          st.write(f"المساعد الشخصي: {random_row['answer']}")
-        else:
-          st.write(f"المساعد الشخصي: عفوا لم افهم السوال")
+        
+        try:
+            mask = data['label'] == output[0]
+            if mask.any():
+                random_index = np.random.choice(mask[mask].index)
+                random_row = data.iloc[random_index]
+                st.write(f"المساعد الشخصي: {random_row['answer']}")
+            else:
+                st.write(f"المساعد الشخصي: عفوا لم افهم السوال")
+        except ValueError as e:
+            st.write("Error:", e)
+            st.write(f"المساعد الشخصي: عفوا لم افهم السوال")
 
 st.title("Medica AI Assistant")
 
